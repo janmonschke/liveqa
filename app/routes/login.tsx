@@ -14,7 +14,7 @@ export default function Login() {
 export async function action({ request }: ActionFunctionArgs) {
   try {
     return await authenticator.authenticate("user-pass", request, {
-      successRedirect: "/",
+      successRedirect: "/host",
       throwOnError: true,
     });
   } catch (error) {
