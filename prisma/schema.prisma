@@ -31,7 +31,7 @@ model QA {
   QAConfig    QAConfig?
   Topic       Topic[]
   Participant Participant[]
-  Host        Host?         @relation(fields: [hostId], references: [id])
+  Host        Host?         @relation(fields: [hostId], references: [id], onDelete: Cascade)
   hostId      String?
 }
 
