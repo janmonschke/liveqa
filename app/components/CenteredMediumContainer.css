@@ -1,0 +1,15 @@
+.CenteredMediumContainer {
+  padding: 10%;
+  display: flex;
+  justify-content: center;
+}
+
+.CenteredMediumContainerContent {
+  max-width: 320px;
+}
+
+@media (min-width: 600px) {
+  .CenteredMediumContainerContent {
+    max-width: 500px;
+  }
+}

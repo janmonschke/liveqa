@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Host {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  name         String   @unique
+  passwordHash String
+  QAs          QA[]
+}
+
+model QA {
+  id          String        @id @default(uuid())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  inviteToken String        @default("")
+  title       String
+  QAConfig    QAConfig?
+  Topic       Topic[]
+  Participant Participant[]
+  Host        Host?         @relation(fields: [hostId], references: [id])
+  hostId      String?
+}
+
+model QAConfig {
+  id              String  @id @default(uuid())
+  areVotesEnabled Boolean @default(false)
+  QA              QA      @relation(fields: [qaId], references: [id], onDelete: Cascade)
+  qaId            String  @unique @map("qaId")
+}
+
+model Topic {
+  id        String     @id @unique @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  QA        QA         @relation(fields: [qaId], references: [id], onDelete: Cascade)
+  qaId      String
+  title     String
+  questions Question[]
+}
+
+model Participant {
+  id        String     @id @default(uuid())
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  QA        QA         @relation(fields: [qaId], references: [id], onDelete: Cascade)
+  qaId      String     @map("qaId")
+  questions Question[]
+  votes     Vote[]
+}
+
+model Question {
+  id            String      @id @default(uuid())
+  // localId is only used for client-side caching
+  localId       String      @default("")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  participant   Participant @relation(fields: [participantId], references: [id])
+  participantId String
+  text          String
+  votes         Vote[]
+  Topic         Topic       @relation(fields: [topicId], references: [id])
+  topicId       String
+}
+
+model Vote {
+  id            String      @id @default(uuid())
+  topicId       String
+  participantId String
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  Question      Question    @relation(fields: [questionId], references: [id])
+  questionId    String
+}
