@@ -1,5 +1,9 @@
 export function qa(qaId: string) {
-  return `/qa/${qaId}`
+  return `/qa/${qaId}`;
+}
+
+export function qaQr(qaId: string) {
+  return `/qa/qr/${qaId}`;
 }
 
 export function qaAdmin(qaId: string) {

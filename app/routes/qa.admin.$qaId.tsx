@@ -1,4 +1,4 @@
-import { Cross2Icon } from "@radix-ui/react-icons";
+import { ArrowTopRightIcon, Cross2Icon } from "@radix-ui/react-icons";
 import {
   Box,
   Button,
@@ -10,10 +10,10 @@ import {
   Text,
 } from "@radix-ui/themes";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData, useSubmit } from "@remix-run/react";
+import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
 import { FormEvent } from "react";
 import { isQaAdmin } from "~/helpers/access";
-import { qaConfigCrud, qaTopicCrud } from "~/helpers/routes";
+import { qaConfigCrud, qaQr, qaTopicCrud } from "~/helpers/routes";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const qa = await isQaAdmin(params.qaId, request);
@@ -40,9 +40,14 @@ export default function QaAdmin() {
 
   return (
     <section>
-      <Heading as="h1" size="8" mb="3">
+      <Heading as="h1" size="8" mb="2">
         {qa.title}
       </Heading>
+      <Box mb="3">
+        <Link to={qaQr(qa.id)} target="_blank" rel="noreferrer">
+          Open QR code <ArrowTopRightIcon />
+        </Link>
+      </Box>
       <Heading as="h2" mb="2">
         Config
       </Heading>
