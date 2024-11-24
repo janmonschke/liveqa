@@ -31,6 +31,6 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export async function loader({ request }: LoaderFunctionArgs) {
   return await authenticator.isAuthenticated(request, {
-    successRedirect: "/overview",
+    successRedirect: "/host",
   });
 }

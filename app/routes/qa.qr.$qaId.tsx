@@ -22,7 +22,7 @@ export default function QaQr() {
     });
   });
   return (
-    <Flex align="center" justify="center" direction="column" gap="3">
+    <Flex align="center" justify="center" direction="column" gap="2">
       <canvas id="qrcode" />
       <Heading size="8" id="qrurl"></Heading>
     </Flex>
