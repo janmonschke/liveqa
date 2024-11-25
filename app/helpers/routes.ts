@@ -6,6 +6,14 @@ export function qaQr(qaId: string) {
   return `/qa/qr/${qaId}`;
 }
 
+export function qaQuestionCrud(qaId: string) {
+  return `${qa(qaId)}/question`;
+}
+
+export function qaVoteCrud(qaId: string) {
+  return `${qa(qaId)}/vote`;
+}
+
 export function qaAdmin(qaId: string) {
   return `/qa/admin/${qaId}`;
 }

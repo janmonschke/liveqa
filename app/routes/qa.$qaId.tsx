@@ -1,109 +1,119 @@
-import { Cross2Icon } from "@radix-ui/react-icons";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Flex,
-  Heading,
-  IconButton,
-  TextField,
-  Text,
-} from "@radix-ui/themes";
-import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData, useSubmit } from "@remix-run/react";
-import { FormEvent } from "react";
-import { isQaAdmin } from "~/helpers/access";
-import { qaConfigCrud, qaTopicCrud } from "~/helpers/routes";
+import { Box, Heading } from "@radix-ui/themes";
+import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { QuestionsAndForm } from "~/components/QuestionsAndForm";
+import { db } from "~/db.server";
+import { qa } from "~/helpers/routes";
+import { participantSessionStorage } from "~/services/participantSession.server";
+
+async function makeOrReadParticipant(qaId: string, request: Request) {
+  const participantSession = await participantSessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
+
+  const participantId = participantSession.get(qaId);
+
+  if (participantId) {
+    const participant = await db.participant.findFirst({
+      where: {
+        id: participantId,
+        qaId,
+      },
+    });
+
+    if (!participant) {
+      throw new Response("Could not find participant", { status: 404 });
+    }
+    return participant;
+  }
+
+  const participant = await db.participant.create({
+    data: {
+      qaId,
+    },
+  });
+
+  participantSession.set(qaId, participant.id);
+  throw redirect(qa(qaId), {
+    headers: {
+      "Set-Cookie": await participantSessionStorage.commitSession(
+        participantSession
+      ),
+    },
+  });
+}
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const qa = await isQaAdmin(params.qaId, request);
-  return json({ qa });
+  const { qaId } = params;
+  if (!qaId) {
+    throw new Response("qaId missing", { status: 400 });
+  }
+  const participant = await makeOrReadParticipant(qaId, request);
+  const qa = await db.qA.findFirstOrThrow({
+    where: {
+      id: qaId,
+    },
+    include: {
+      QAConfig: true,
+      Topic: {
+        include: {
+          questions: {
+            orderBy: {
+              votes: { _count: "desc" },
+            },
+            include: {
+              votes: {
+                select: {
+                  id: true,
+                  questionId: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+  const participantVotes = (
+    await db.vote.findMany({
+      where: {
+        participantId: participant.id,
+      },
+    })
+  ).reduce((acc, curr) => {
+    acc[curr.questionId] = true;
+    return acc;
+  }, {} as Record<string, boolean>);
+  return json({ qa, participant, participantVotes });
 };
 
 export default function QaAdmin() {
-  const { qa } = useLoaderData<typeof loader>();
-  const configSubmit = useSubmit();
-
-  function handleChange(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const params = {
-      ["areVotesEnabled"]: event.currentTarget["areVotesEnabled"].checked,
-    };
-    configSubmit(params, {
-      action: qaConfigCrud(qa.id),
-      method: "POST",
-      navigate: false,
-    });
-  }
-
+  const { qa, participant, participantVotes } = useLoaderData<typeof loader>();
   return (
     <section>
       <Heading as="h1" size="8" mb="3">
         {qa.title}
       </Heading>
       <Heading as="h2" mb="2">
-        Config
-      </Heading>
-      {qa.QAConfig && (
-        <Box mb="4">
-          <Form onChange={handleChange}>
-            <Text as="label" size="2">
-              <Flex gap="2">
-                <Checkbox
-                  defaultChecked={qa.QAConfig.areVotesEnabled}
-                  name="areVotesEnabled"
-                />
-                voting enabled
-              </Flex>
-            </Text>
-          </Form>
-        </Box>
-      )}
-      <Heading as="h2" mb="2">
         Topics
       </Heading>
       {qa.Topic.map((topic) => (
         <Box key={topic.id} mb="4">
-          <Flex gap="3" align="center" mb="2">
+          <Box mb="2">
             <Heading as="h3" size="4">
               {topic.title}
             </Heading>
-            <Form method="delete" action={qaTopicCrud(qa.id)}>
-              <input type="hidden" name="topicId" value={topic.id} />
-              <IconButton
-                variant="soft"
-                type="submit"
-                color="red"
-                size="1"
-                title={`Delete topic: ${topic.title}`}
-              >
-                <Cross2Icon />
-              </IconButton>
-            </Form>
-          </Flex>
+          </Box>
 
-          {topic.questions.length > 0 ? (
-            <ol>
-              {topic.questions.map((question) => (
-                <li key={question.id}>
-                  {question.text} - {question.votes.length}
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p>No questions yet</p>
-          )}
+          <QuestionsAndForm
+            qaId={qa.id}
+            topicId={topic.id}
+            participantId={participant.id}
+            questions={topic.questions}
+            participantVotes={participantVotes}
+          />
         </Box>
       ))}
-      <Form method="post" action={qaTopicCrud(qa.id)}>
-        <Flex maxWidth="6" gap="2" mt="5">
-          <TextField.Root placeholder="Topic title" name="title" required />
-          <Button type="submit">Create topic</Button>
-        </Flex>
-      </Form>
     </section>
   );
 }
-

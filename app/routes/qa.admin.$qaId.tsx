@@ -13,7 +13,7 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
 import { FormEvent } from "react";
 import { isQaAdmin } from "~/helpers/access";
-import { qaConfigCrud, qaQr, qaTopicCrud } from "~/helpers/routes";
+import { qaConfigCrud, qaQr, qaTopicCrud, qa as qaUrl } from "~/helpers/routes";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const qa = await isQaAdmin(params.qaId, request);
@@ -43,11 +43,14 @@ export default function QaAdmin() {
       <Heading as="h1" size="8" mb="2">
         {qa.title}
       </Heading>
-      <Box mb="3">
+      <Flex mb="3" gap="2">
         <Link to={qaQr(qa.id)} target="_blank" rel="noreferrer">
           Open QR code <ArrowTopRightIcon />
         </Link>
-      </Box>
+        <Link to={qaUrl(qa.id)} target="_blank" rel="noreferrer">
+          Open Live QA <ArrowTopRightIcon />
+        </Link>
+      </Flex>
       <Heading as="h2" mb="2">
         Config
       </Heading>
