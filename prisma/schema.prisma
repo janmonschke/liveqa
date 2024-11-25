@@ -78,7 +78,6 @@ model Question {
 
 model Vote {
   id            String      @id @default(uuid())
-  topicId       String
   participantId String
   participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
   Question      Question    @relation(fields: [questionId], references: [id])
