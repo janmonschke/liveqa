@@ -29,7 +29,6 @@ export function Question({
   participantVotes,
 }: Props) {
   const deleteQuestion = useSubmit();
-  console.log(question);
   const handleDeleteQuestion = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();

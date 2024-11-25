@@ -11,8 +11,6 @@ type Props = {
 };
 
 export function Vote({ qaId, questionId, hasVoted }: Props) {
-  console.log({ hasVoted });
-
   const submitVote = useSubmit();
 
   const handleSubmitVote = useCallback(
