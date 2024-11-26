@@ -1,9 +1,10 @@
 import { Cross2Icon } from "@radix-ui/react-icons";
-import { Box, Flex, IconButton } from "@radix-ui/themes";
+import { Box, Card, Flex, IconButton, Text, Tooltip } from "@radix-ui/themes";
 import { Form, useSubmit } from "@remix-run/react";
 import { FormEvent, useCallback } from "react";
 import { qaQuestionCrud } from "~/helpers/routes";
 import { Vote } from "./Vote";
+import { iconButtonSize } from "~/helpers/sizes";
 
 type Props = {
   qaId: string;
@@ -36,8 +37,8 @@ export function Question({
       if (
         confirm(
           "Are you sure you want to delete the question: " +
-            question.text +
-            " ?"
+          question.text +
+          " ?"
         )
       ) {
         deleteQuestion(
@@ -57,25 +58,27 @@ export function Question({
     [deleteQuestion, topicId, qaId, question]
   );
   const hasVoted = participantVotes[question.id] === true;
+  const voteCountText = voteCount === 1 ? "1 vote" : `${voteCount} votes`;
   return (
-    <Flex>
-      <Box>
-        {question.text} - {voteCount}
-      </Box>
-      <Vote hasVoted={hasVoted} questionId={question.id} qaId={qaId} />
-      {question.participantId === participantId ? (
-        <Form onSubmit={handleDeleteQuestion}>
-          <IconButton
-            variant="soft"
-            type="submit"
-            color="red"
-            size="1"
-            title={`Delete question: ${question.text}`}
-          >
-            <Cross2Icon />
-          </IconButton>
-        </Form>
-      ) : null}
-    </Flex>
+    <Card variant="surface">
+      <Flex p="1" justify="between" align="center" gap="3">
+        <Flex direction="column">
+          <Box>{question.text}</Box>
+          <Box><Text size="1" color="gray">{voteCountText}</Text></Box>
+        </Flex>
+        <Flex gap="3">
+          <Vote hasVoted={hasVoted} questionId={question.id} qaId={qaId} />
+          {question.participantId === participantId ? (
+            <Form onSubmit={handleDeleteQuestion}>
+              <Tooltip content={`Delete question: ${question.text}`}>
+                <IconButton variant="soft" type="submit" color="red" size={iconButtonSize}>
+                  <Cross2Icon />
+                </IconButton>
+              </Tooltip>
+            </Form>
+          ) : null}
+        </Flex>
+      </Flex>
+    </Card>
   );
 }

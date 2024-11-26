@@ -17,13 +17,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   switch (request.method) {
     case "DELETE": {
-      const voteId = body.get("voteId")?.toString();
-      if (!voteId) {
-        throw new Response("Question not found", { status: 404 });
-      }
-      await db.vote.delete({
+      await db.vote.deleteMany({
         where: {
-          id: voteId,
           questionId,
           participantId: participant.id,
         },

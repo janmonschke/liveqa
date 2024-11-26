@@ -1,8 +1,9 @@
-import { PlusIcon } from "@radix-ui/react-icons";
-import { IconButton } from "@radix-ui/themes";
+import { DoubleArrowDownIcon, DoubleArrowUpIcon, PlusIcon } from "@radix-ui/react-icons";
+import { IconButton, Tooltip } from "@radix-ui/themes";
 import { Form, useFetcher, useSubmit } from "@remix-run/react";
 import { FormEvent, useCallback } from "react";
 import { qaVoteCrud } from "~/helpers/routes";
+import { iconButtonSize } from "~/helpers/sizes";
 
 type Props = {
   qaId: string;
@@ -34,13 +35,43 @@ export function Vote({ qaId, questionId, hasVoted }: Props) {
     },
     [submitVote, qaId, questionId, fetcherKey]
   );
+  const handleDeleteVote = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      submitVote(
+        {
+          questionId: questionId,
+        },
+
+        {
+          action: qaVoteCrud(qaId),
+          method: "DELETE",
+          navigate: false,
+          fetcherKey,
+        }
+      );
+    },
+    [submitVote, qaId, questionId, fetcherKey]
+  );
+
   const canVote = fetcher.state === "idle" && !hasVoted;
 
   return canVote ? (
     <Form onSubmit={handleSubmitVote}>
-      <IconButton variant="soft" type="submit" size="1" title={`Vote`}>
-        <PlusIcon />
-      </IconButton>
+      <Tooltip content="Vote">
+        <IconButton variant="soft" type="submit" size={iconButtonSize}>
+          <DoubleArrowUpIcon />
+        </IconButton>
+      </Tooltip>
     </Form>
-  ) : null;
+  ) : (
+    <Form onSubmit={handleDeleteVote}>
+      <Tooltip content="Remove vote">
+        <IconButton variant="soft" type="submit" size={iconButtonSize} color="red">
+          <DoubleArrowDownIcon />
+        </IconButton>
+      </Tooltip>
+    </Form>
+  );
 }

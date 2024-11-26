@@ -3,6 +3,7 @@ import { Form, useSubmit } from "@remix-run/react";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { qaQuestionCrud } from "~/helpers/routes";
 import { Question } from "./Question";
+import "./QuestionsAndForm.css";
 
 type Props = {
   qaId: string;
@@ -71,17 +72,19 @@ export function QuestionsAndForm({
   return (
     <Box>
       {hasQuestions ? (
-        <ol>
+        <ol className="QuestionsList">
           {localQ.map((question) => (
             <li key={question.id}>
-              <Question
-                qaId={qaId}
-                topicId={topicId}
-                question={question}
-                participantId={participantId}
-                participantVotes={participantVotes}
-                voteCount={question.votes.length}
-              />
+              <Box mb="2">
+                <Question
+                  qaId={qaId}
+                  topicId={topicId}
+                  question={question}
+                  participantId={participantId}
+                  participantVotes={participantVotes}
+                  voteCount={question.votes.length}
+                />
+              </Box>
             </li>
           ))}
         </ol>
