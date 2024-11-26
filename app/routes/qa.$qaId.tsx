@@ -58,9 +58,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
       Topic: {
         include: {
           questions: {
-            orderBy: {
-              votes: { _count: "desc" },
-            },
+            orderBy: [{ votes: { _count: "desc" } }, { createdAt: "asc" }],
             include: {
               votes: {
                 select: {
@@ -87,7 +85,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   return json({ qa, participant, participantVotes });
 };
 
-export default function QaAdmin() {
+export default function QaView() {
   const { qa, participant, participantVotes } = useLoaderData<typeof loader>();
   return (
     <section>

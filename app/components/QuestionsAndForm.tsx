@@ -1,6 +1,6 @@
 import { Box, Button, Flex, TextField } from "@radix-ui/themes";
 import { Form, useSubmit } from "@remix-run/react";
-import { FormEvent, useCallback } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { qaQuestionCrud } from "~/helpers/routes";
 import { Question } from "./Question";
 
@@ -29,15 +29,21 @@ export function QuestionsAndForm({
   participantVotes,
 }: Props) {
   const submitQuestion = useSubmit();
+  const [localQ, setLocalQ] = useState(questions);
+
+  useEffect(() => {
+    setLocalQ(questions);
+  }, [questions]);
 
   const handleSubmitQuestion = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       event.stopPropagation();
+      const text = event.currentTarget["text"].value;
       submitQuestion(
         {
           topicId,
-          text: event.currentTarget["text"].value,
+          text,
         },
         {
           action: qaQuestionCrud(qaId),
@@ -46,15 +52,27 @@ export function QuestionsAndForm({
         }
       );
       event.currentTarget.reset();
+      setLocalQ((currQ) => {
+        return [
+          ...currQ,
+          {
+            participantId,
+            id: Math.random().toString(),
+            votes: [],
+            text,
+          },
+        ];
+      });
     },
-    [submitQuestion, topicId, qaId]
+    [submitQuestion, topicId, qaId, participantId]
   );
+  const hasQuestions = localQ.length > 0;
 
   return (
     <Box>
-      {questions.length > 0 ? (
+      {hasQuestions ? (
         <ol>
-          {questions.map((question) => (
+          {localQ.map((question) => (
             <li key={question.id}>
               <Question
                 qaId={qaId}
