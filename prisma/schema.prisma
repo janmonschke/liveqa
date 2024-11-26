@@ -68,11 +68,11 @@ model Question {
   localId       String      @default("")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  participant   Participant @relation(fields: [participantId], references: [id])
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
   participantId String
   text          String
   votes         Vote[]
-  Topic         Topic       @relation(fields: [topicId], references: [id])
+  Topic         Topic       @relation(fields: [topicId], references: [id], onDelete: Cascade)
   topicId       String
 }
 
@@ -80,6 +80,6 @@ model Vote {
   id            String      @id @default(uuid())
   participantId String
   participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
-  Question      Question    @relation(fields: [questionId], references: [id])
+  Question      Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
   questionId    String
 }
