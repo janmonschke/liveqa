@@ -1,6 +1,8 @@
 import { Box, Heading } from "@radix-ui/themes";
 import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useFetchers, useLoaderData, useRevalidator } from "@remix-run/react";
+import { useEffect, useMemo, useRef } from "react";
+import { useEventSource } from "remix-utils/sse/react";
 import { QuestionsAndForm } from "~/components/QuestionsAndForm";
 import { db } from "~/db.server";
 import { qa } from "~/helpers/routes";
@@ -87,6 +89,39 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
 export default function QaView() {
   const { qa, participant, participantVotes } = useLoaderData<typeof loader>();
+
+  const revalidator = useRevalidator();
+  const fetchers = useFetchers();
+
+  const areFetchersActive = useMemo(
+    () => fetchers.some((fetcher) => fetcher.state !== "idle"),
+    [fetchers]
+  );
+
+  const latestUpdate = useEventSource(
+    `/sse/qa/${qa.id}`,
+    {
+      event: "update",
+    }
+  );
+  const latestUpdateRef = useRef(latestUpdate);
+
+  // Need to revalidate when the position changes, otherwise SSE gets out of sync.
+  useEffect(() => {
+    if (
+      latestUpdate !== null &&
+      // Only revalidate when did not receive this update yet
+      latestUpdateRef.current !== latestUpdate &&
+      // Wait until all other fetchers are done, to avoid glitches
+      !areFetchersActive &&
+      // Only revalidate when no revalidation in progress
+      revalidator.state === "idle"
+    ) {
+      revalidator.revalidate();
+    }
+    latestUpdateRef.current = latestUpdate;
+  }, [revalidator, latestUpdate, latestUpdateRef, areFetchersActive]);
+
   return (
     <section>
       <Heading as="h1" size="8" mb="3">

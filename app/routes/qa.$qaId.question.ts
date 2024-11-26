@@ -1,23 +1,25 @@
 import { ActionFunction, redirect } from "@remix-run/node";
 import { db } from "~/db.server";
 import { isQaParticipant } from "~/helpers/access";
+import { updateQaEvent } from "~/helpers/events";
 import { qa } from "~/helpers/routes";
+import { emitter } from "~/services/emitter.server";
 
 export const action: ActionFunction = async ({ request, params }) => {
   const { qaId } = params;
   const body = await request.formData();
   const topicId = body.get("topicId")?.toString();
   if (!topicId || !qaId) {
-    throw new Response("", { status: 404, statusText: '`topicId` missing' });
+    throw new Response("", { status: 404, statusText: "`topicId` missing" });
   }
 
   const participant = await isQaParticipant(qaId, request);
 
   switch (request.method) {
     case "DELETE": {
-      const questionId = body.get('questionId')?.toString();
+      const questionId = body.get("questionId")?.toString();
       if (!questionId) {
-        throw new Response('Question not found', { status: 404 })
+        throw new Response("Question not found", { status: 404 });
       }
       await db.question.delete({
         where: {
@@ -42,6 +44,6 @@ export const action: ActionFunction = async ({ request, params }) => {
       });
     }
   }
+  emitter.emit(updateQaEvent(qaId), Date.now());
   return redirect(qa(qaId));
 };
-

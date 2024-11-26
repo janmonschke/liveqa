@@ -1,7 +1,9 @@
 import { ActionFunction, redirect } from "@remix-run/node";
 import { db } from "~/db.server";
 import { isQaParticipant } from "~/helpers/access";
+import { updateQaEvent } from "~/helpers/events";
 import { qa } from "~/helpers/routes";
+import { emitter } from "~/services/emitter.server";
 
 export const action: ActionFunction = async ({ request, params }) => {
   const { qaId } = params;
@@ -51,5 +53,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       });
     }
   }
+
+  emitter.emit(updateQaEvent(qaId), Date.now());
   return redirect(qa(qaId));
 };
