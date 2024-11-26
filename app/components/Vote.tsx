@@ -1,4 +1,4 @@
-import { DoubleArrowDownIcon, DoubleArrowUpIcon, PlusIcon } from "@radix-ui/react-icons";
+import { DoubleArrowDownIcon, DoubleArrowUpIcon } from "@radix-ui/react-icons";
 import { IconButton, Tooltip } from "@radix-ui/themes";
 import { Form, useFetcher, useSubmit } from "@remix-run/react";
 import { FormEvent, useCallback } from "react";
@@ -55,12 +55,13 @@ export function Vote({ qaId, questionId, hasVoted }: Props) {
     [submitVote, qaId, questionId, fetcherKey]
   );
 
-  const canVote = fetcher.state === "idle" && !hasVoted;
+  const isFetching = fetcher.state !== "idle";
+  const canVote = !isFetching && fetcher.state === "idle" && !hasVoted;
 
   return canVote ? (
     <Form onSubmit={handleSubmitVote}>
       <Tooltip content="Vote">
-        <IconButton variant="soft" type="submit" size={iconButtonSize}>
+        <IconButton loading={isFetching} variant="soft" type="submit" size={iconButtonSize}>
           <DoubleArrowUpIcon />
         </IconButton>
       </Tooltip>
@@ -68,7 +69,7 @@ export function Vote({ qaId, questionId, hasVoted }: Props) {
   ) : (
     <Form onSubmit={handleDeleteVote}>
       <Tooltip content="Remove vote">
-        <IconButton variant="soft" type="submit" size={iconButtonSize} color="red">
+        <IconButton loading={isFetching} variant="soft" type="submit" size={iconButtonSize} color="red">
           <DoubleArrowDownIcon />
         </IconButton>
       </Tooltip>

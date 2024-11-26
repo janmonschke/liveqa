@@ -3,7 +3,6 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration,
   useRouteLoaderData,
 } from "@remix-run/react";
 import { Container, Theme, ThemePanel } from "@radix-ui/themes";
@@ -38,7 +37,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <Toast toast={data?.toast} />
           <Container>{children}</Container>
         </Theme>
-        <ScrollRestoration />
         <Scripts />
       </body>
     </html>
