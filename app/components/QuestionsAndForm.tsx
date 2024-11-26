@@ -113,24 +113,33 @@ export function QuestionsAndForm({
           <Button>Add question</Button>
         </Dialog.Trigger>
         <Dialog.Content>
-          <Dialog.Title>Add your question</Dialog.Title>
+          <Dialog.Title>New question</Dialog.Title>
           <Dialog.Description>
             Add a new question to{" "}
             <Badge color="indigo" size="2">
               {topic}
             </Badge>
+            {" :"}
           </Dialog.Description>
           <fetcher.Form onSubmit={handleSubmitQuestion}>
-            <Flex maxWidth="6" gap="2" mt="5">
+            <Flex maxWidth="6" gap="2" mt="4" direction="column">
               <TextField.Root
                 placeholder="Your question"
                 name="text"
                 required
                 disabled={isLoading}
               />
-              <Button disabled={isLoading} loading={isLoading} type="submit">
-                Add question
-              </Button>
+              <Flex justify="end" gap="2">
+                <Dialog.Close>
+                  <Button variant="soft" color="gray">
+                    Cancel
+                  </Button>
+                </Dialog.Close>
+
+                <Button disabled={isLoading} loading={isLoading} type="submit">
+                  Add question
+                </Button>
+              </Flex>
             </Flex>
           </fetcher.Form>
         </Dialog.Content>

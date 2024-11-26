@@ -1,6 +1,6 @@
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Box, Card, Flex, IconButton, Text, Tooltip } from "@radix-ui/themes";
-import { Form, useSubmit } from "@remix-run/react";
+import { Form, useFetcher, useSubmit } from "@remix-run/react";
 import { FormEvent, useCallback } from "react";
 import { qaQuestionCrud } from "~/helpers/routes";
 import { Vote } from "./Vote";
@@ -30,6 +30,11 @@ export function Question({
   participantVotes,
 }: Props) {
   const deleteQuestion = useSubmit();
+  const fetcherKey = `deleteQuestion:${question.id}`;
+  const deleteFetcher = useFetcher({
+    key: fetcherKey,
+  });
+  const isDeleting = deleteFetcher.state !== "idle";
   const handleDeleteQuestion = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -51,11 +56,12 @@ export function Question({
             action: qaQuestionCrud(qaId),
             method: "DELETE",
             navigate: false,
+            fetcherKey,
           }
         );
       }
     },
-    [deleteQuestion, topicId, qaId, question]
+    [deleteQuestion, topicId, qaId, question, fetcherKey]
   );
   const hasVoted = participantVotes[question.id] === true;
   const voteCountText = voteCount === 1 ? "1 vote" : `${voteCount} votes`;
@@ -64,14 +70,25 @@ export function Question({
       <Flex p="1" justify="between" align="center" gap="3">
         <Flex direction="column">
           <Box>{question.text}</Box>
-          <Box><Text size="1" color="gray">{voteCountText}</Text></Box>
+          <Box>
+            <Text size="1" color="gray">
+              {voteCountText}
+            </Text>
+          </Box>
         </Flex>
         <Flex gap="3">
           <Vote hasVoted={hasVoted} questionId={question.id} qaId={qaId} />
           {question.participantId === participantId ? (
             <Form onSubmit={handleDeleteQuestion}>
               <Tooltip content={`Delete question: ${question.text}`}>
-                <IconButton variant="soft" type="submit" color="red" size={iconButtonSize}>
+                <IconButton
+                  variant="soft"
+                  type="submit"
+                  color="red"
+                  size={iconButtonSize}
+                  loading={isDeleting}
+                  disabled={isDeleting}
+                >
                   <Cross2Icon />
                 </IconButton>
               </Tooltip>
