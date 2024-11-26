@@ -1,12 +1,13 @@
-import { Box, Button, Flex, TextField } from "@radix-ui/themes";
-import { Form, useSubmit } from "@remix-run/react";
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { Badge, Box, Button, Dialog, Flex, TextField } from "@radix-ui/themes";
+import { useFetcher, useSubmit } from "@remix-run/react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { qaQuestionCrud } from "~/helpers/routes";
 import { Question } from "./Question";
 import "./QuestionsAndForm.css";
 
 type Props = {
   qaId: string;
+  topic: string;
   topicId: string;
   participantId: string;
   questions: {
@@ -24,6 +25,7 @@ type Props = {
 
 export function QuestionsAndForm({
   qaId,
+  topic,
   topicId,
   questions,
   participantId,
@@ -35,6 +37,20 @@ export function QuestionsAndForm({
   useEffect(() => {
     setLocalQ(questions);
   }, [questions]);
+
+  const fetcher = useFetcher({
+    key: "question",
+  });
+  const isLoading = fetcher.state !== "idle";
+  const currFetcherState = useRef("idle");
+
+  useEffect(() => {
+    const oldState = currFetcherState.current;
+    if (oldState !== "idle" && fetcher.state === "idle") {
+      setIsOpen(false);
+    }
+    currFetcherState.current = fetcher.state;
+  }, [fetcher.state]);
 
   const handleSubmitQuestion = useCallback(
     (event: FormEvent<HTMLFormElement>) => {
@@ -50,9 +66,9 @@ export function QuestionsAndForm({
           action: qaQuestionCrud(qaId),
           method: "POST",
           navigate: false,
+          fetcherKey: "question",
         }
       );
-      event.currentTarget.reset();
       setLocalQ((currQ) => {
         return [
           ...currQ,
@@ -67,6 +83,7 @@ export function QuestionsAndForm({
     },
     [submitQuestion, topicId, qaId, participantId]
   );
+  const [isOpen, setIsOpen] = useState(false);
   const hasQuestions = localQ.length > 0;
 
   return (
@@ -91,12 +108,33 @@ export function QuestionsAndForm({
       ) : (
         <p>No questions yet</p>
       )}
-      <Form onSubmit={handleSubmitQuestion}>
-        <Flex maxWidth="6" gap="2" mt="5">
-          <TextField.Root placeholder="Your question" name="text" required />
-          <Button type="submit">Add question</Button>
-        </Flex>
-      </Form>
+      <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog.Trigger>
+          <Button>Add question</Button>
+        </Dialog.Trigger>
+        <Dialog.Content>
+          <Dialog.Title>Add your question</Dialog.Title>
+          <Dialog.Description>
+            Add a new question to{" "}
+            <Badge color="indigo" size="2">
+              {topic}
+            </Badge>
+          </Dialog.Description>
+          <fetcher.Form onSubmit={handleSubmitQuestion}>
+            <Flex maxWidth="6" gap="2" mt="5">
+              <TextField.Root
+                placeholder="Your question"
+                name="text"
+                required
+                disabled={isLoading}
+              />
+              <Button disabled={isLoading} loading={isLoading} type="submit">
+                Add question
+              </Button>
+            </Flex>
+          </fetcher.Form>
+        </Dialog.Content>
+      </Dialog.Root>
     </Box>
   );
 }

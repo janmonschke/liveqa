@@ -127,19 +127,17 @@ export default function QaView() {
       <Heading as="h1" size="8" mb="3">
         {qa.title}
       </Heading>
-      <Heading as="h2" mb="2">
-        Topics
-      </Heading>
       {qa.Topic.map((topic) => (
         <Box key={topic.id} mb="4">
           <Box mb="2">
-            <Heading as="h3" size="4">
+            <Heading as="h3" size="6">
               {topic.title}
             </Heading>
           </Box>
 
           <QuestionsAndForm
             qaId={qa.id}
+            topic={topic.title}
             topicId={topic.id}
             participantId={participant.id}
             questions={topic.questions}
