@@ -52,24 +52,33 @@ export async function isQaParticipant(
     request.headers.get("Cookie")
   );
 
-  const participantId =  participantSession.get(qaId);
+  const participantId = participantSession.get(qaId);
   const qa = await db.qA.findFirstOrThrow({
-      where: {
-        id: qaId,
-      },
-      include: {
-        Participant: {
-          where: {
-            id: participantId
-          }
+    where: {
+      id: qaId,
+    },
+    include: {
+      Participant: {
+        where: {
+          id: participantId,
         },
       },
-    })
+    },
+  });
 
-  const isParticipant =  qa.Participant.length === 1;
+  const isParticipant = qa.Participant.length === 1;
   if (isParticipant) {
     return qa.Participant[0];
   } else {
-    throw new Response("You need to be a participant", { status: 403 })
+    throw new Response("You need to be a participant", { status: 403 });
   }
+}
+
+export async function isVotingEnabledForQa(qaId: string | undefined) {
+  const qaConfig = await db.qAConfig.findFirstOrThrow({
+    where: {
+      qaId,
+    },
+  });
+  return qaConfig.areVotesEnabled;
 }

@@ -7,6 +7,7 @@ import "./QuestionsAndForm.css";
 
 type Props = {
   qaId: string;
+  votingEnabled: boolean;
   topic: string;
   topicId: string;
   participantId: string;
@@ -25,6 +26,7 @@ type Props = {
 
 export function QuestionsAndForm({
   qaId,
+  votingEnabled,
   topic,
   topicId,
   questions,
@@ -95,6 +97,7 @@ export function QuestionsAndForm({
               <Box mb="2">
                 <Question
                   qaId={qaId}
+                  votingEnabled={votingEnabled}
                   topicId={topicId}
                   question={question}
                   participantId={participantId}
@@ -108,42 +111,49 @@ export function QuestionsAndForm({
       ) : (
         <p>No questions yet</p>
       )}
-      <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
-        <Dialog.Trigger>
-          <Button>Add question</Button>
-        </Dialog.Trigger>
-        <Dialog.Content>
-          <Dialog.Title>New question</Dialog.Title>
-          <Dialog.Description>
-            Add a new question to{" "}
-            <Badge color="indigo" size="2">
-              {topic}
-            </Badge>
-            {" :"}
-          </Dialog.Description>
-          <fetcher.Form onSubmit={handleSubmitQuestion}>
-            <Flex maxWidth="6" gap="2" mt="4" direction="column">
-              <TextField.Root
-                placeholder="Your question"
-                name="text"
-                required
-                disabled={isLoading}
-              />
-              <Flex justify="end" gap="2">
-                <Dialog.Close>
-                  <Button variant="soft" color="gray">
-                    Cancel
-                  </Button>
-                </Dialog.Close>
 
-                <Button disabled={isLoading} loading={isLoading} type="submit">
-                  Add question
-                </Button>
+      {votingEnabled ? (
+        <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+          <Dialog.Trigger>
+            <Button>Add question</Button>
+          </Dialog.Trigger>
+          <Dialog.Content>
+            <Dialog.Title size="4">New question</Dialog.Title>
+            <Dialog.Description>
+              Add a new question to{" "}
+              <Badge color="indigo" size="2">
+                {topic}
+              </Badge>
+              {" :"}
+            </Dialog.Description>
+            <fetcher.Form onSubmit={handleSubmitQuestion}>
+              <Flex maxWidth="6" gap="2" mt="4" direction="column">
+                <TextField.Root
+                  placeholder="Your question"
+                  name="text"
+                  required
+                  disabled={isLoading}
+                />
+                <Flex justify="end" gap="2">
+                  <Dialog.Close>
+                    <Button variant="soft" color="gray">
+                      Cancel
+                    </Button>
+                  </Dialog.Close>
+
+                  <Button
+                    disabled={isLoading}
+                    loading={isLoading}
+                    type="submit"
+                  >
+                    Add question
+                  </Button>
+                </Flex>
               </Flex>
-            </Flex>
-          </fetcher.Form>
-        </Dialog.Content>
-      </Dialog.Root>
+            </fetcher.Form>
+          </Dialog.Content>
+        </Dialog.Root>
+      ) : null}
     </Box>
   );
 }

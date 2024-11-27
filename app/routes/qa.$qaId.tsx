@@ -88,7 +88,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 };
 
 export default function QaView() {
-  const { qa, participant, participantVotes } = useLoaderData<typeof loader>();
+  const { qa, participant, participantVotes  } = useLoaderData<typeof loader>();
 
   const revalidator = useRevalidator();
   const fetchers = useFetchers();
@@ -137,6 +137,7 @@ export default function QaView() {
 
           <QuestionsAndForm
             qaId={qa.id}
+            votingEnabled={Boolean(qa.QAConfig?.areVotesEnabled)}
             topic={topic.title}
             topicId={topic.id}
             participantId={participant.id}

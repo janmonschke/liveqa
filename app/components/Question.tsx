@@ -8,6 +8,7 @@ import { iconButtonSize } from "~/helpers/sizes";
 
 type Props = {
   qaId: string;
+  votingEnabled: true;
   topicId: string;
   participantId: string;
   voteCount: number;
@@ -23,6 +24,7 @@ type Props = {
 
 export function Question({
   qaId,
+  votingEnabled,
   topicId,
   voteCount,
   participantId,
@@ -77,7 +79,9 @@ export function Question({
           </Box>
         </Flex>
         <Flex gap="3">
-          <Vote hasVoted={hasVoted} questionId={question.id} qaId={qaId} />
+          {votingEnabled ? (
+            <Vote hasVoted={hasVoted} questionId={question.id} qaId={qaId} />
+          ) : null}
           {question.participantId === participantId ? (
             <Form onSubmit={handleDeleteQuestion}>
               <Tooltip content={`Delete question: ${question.text}`}>
