@@ -25,3 +25,8 @@ export function qaTopicCrud(qaId: string) {
 export function qaConfigCrud(qaId: string) {
   return `${qaAdmin(qaId)}/config`;
 }
+
+export function qaAdminQuestionCrud(qaId: string) {
+  return `${qaAdmin(qaId)}/question`;
+}
+

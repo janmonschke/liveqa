@@ -14,21 +14,9 @@ export async function isQaAdmin(qaId: string | undefined, request: Request) {
     });
   }
 
-  const qa = await db.qA.findFirst({
+  const qa = await db.qA.findFirstOrThrow({
     where: {
       id: qaId,
-    },
-    include: {
-      QAConfig: true,
-      Topic: {
-        include: {
-          questions: {
-            include: {
-              votes: true,
-            },
-          },
-        },
-      },
     },
   });
 

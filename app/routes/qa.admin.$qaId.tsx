@@ -8,15 +8,43 @@ import {
   IconButton,
   TextField,
   Text,
+  Tooltip,
 } from "@radix-ui/themes";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
 import { FormEvent } from "react";
+import { BaseQuestion } from "~/components/BaseQuestion";
+import { db } from "~/db.server";
 import { isQaAdmin } from "~/helpers/access";
-import { qaConfigCrud, qaQr, qaTopicCrud, qa as qaUrl } from "~/helpers/routes";
+import {
+  qaAdminQuestionCrud,
+  qaConfigCrud,
+  qaQr,
+  qaTopicCrud,
+  qa as qaUrl,
+} from "~/helpers/routes";
+import { iconButtonSize } from "~/helpers/sizes";
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  const qa = await isQaAdmin(params.qaId, request);
+  await isQaAdmin(params.qaId, request);
+  const qa = await db.qA.findFirstOrThrow({
+    where: {
+      id: params.qaId,
+    },
+    include: {
+      QAConfig: true,
+      Topic: {
+        include: {
+          questions: { 
+            include: {
+              votes: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
   return json({ qa });
 };
 
@@ -37,6 +65,31 @@ export default function QaAdmin() {
       navigate: false,
     });
   }
+
+  const deleteQuestion = useSubmit();
+  const handleDeleteQuestion = (
+    event: FormEvent<HTMLFormElement>,
+    questionId: string,
+    questionText: string
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (
+      confirm(`Are you sure you want to delete the question: ${questionText} ?`)
+    ) {
+      deleteQuestion(
+        {
+          questionId: questionId,
+        },
+
+        {
+          action: qaAdminQuestionCrud(qa.id),
+          method: "DELETE",
+          navigate: false,
+        }
+      );
+    }
+  };
 
   return (
     <section>
@@ -93,10 +146,41 @@ export default function QaAdmin() {
           </Flex>
 
           {topic.questions.length > 0 ? (
-            <ol>
+            <ol style={{ listStyleType: "none", padding: 0 }}>
               {topic.questions.map((question) => (
                 <li key={question.id}>
-                  {question.text} - {question.votes.length}
+                  <Box mb="2">
+                    <BaseQuestion
+                      text={question.text}
+                      voteCount={question.votes.length}
+                      actions={
+                        <>
+                          <Form
+                            onSubmit={(event) =>
+                              handleDeleteQuestion(
+                                event,
+                                question.id,
+                                question.text
+                              )
+                            }
+                          >
+                            <Tooltip
+                              content={`Delete question: ${question.text}`}
+                            >
+                              <IconButton
+                                variant="soft"
+                                type="submit"
+                                color="red"
+                                size={iconButtonSize}
+                              >
+                                <Cross2Icon />
+                              </IconButton>
+                            </Tooltip>
+                          </Form>
+                        </>
+                      }
+                    />
+                  </Box>
                 </li>
               ))}
             </ol>
