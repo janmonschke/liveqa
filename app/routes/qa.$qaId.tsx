@@ -58,6 +58,9 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     include: {
       QAConfig: true,
       Topic: {
+        orderBy: {
+          order: 'asc'
+        },
         include: {
           questions: {
             orderBy: [{ votes: { _count: "desc" } }, { createdAt: "asc" }],

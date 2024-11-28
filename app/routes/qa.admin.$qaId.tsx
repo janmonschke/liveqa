@@ -1,4 +1,9 @@
-import { ArrowTopRightIcon, Cross2Icon } from "@radix-ui/react-icons";
+import {
+  ArrowTopRightIcon,
+  Cross2Icon,
+  ThickArrowDownIcon,
+  ThickArrowUpIcon,
+} from "@radix-ui/react-icons";
 import {
   Box,
   Button,
@@ -34,8 +39,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     include: {
       QAConfig: true,
       Topic: {
+        orderBy: {
+          order: "asc",
+        },
         include: {
-          questions: { 
+          questions: {
             include: {
               votes: true,
             },
@@ -125,12 +133,49 @@ export default function QaAdmin() {
       <Heading as="h2" mb="2">
         Topics
       </Heading>
-      {qa.Topic.map((topic) => (
+      {qa.Topic.map((topic, index) => (
         <Box key={topic.id} mb="4">
           <Flex gap="3" align="center" mb="2">
             <Heading as="h3" size="4">
               {topic.title}
             </Heading>
+            {index > 0 ? (
+              <Form method="patch" action={qaTopicCrud(qa.id)}>
+                <input type="hidden" name="topicId" value={topic.id} />
+                <input
+                  type="hidden"
+                  name="order"
+                  value={qa.Topic[index - 1].order - 1}
+                />
+                <IconButton
+                  variant="soft"
+                  type="submit"
+                  size="1"
+                  title={`Move topic up: ${topic.title}`}
+                >
+                  <ThickArrowUpIcon />
+                </IconButton>
+              </Form>
+            ) : null}
+            {index < qa.Topic.length - 1 ? (
+              <Form method="patch" action={qaTopicCrud(qa.id)}>
+                <input type="hidden" name="topicId" value={topic.id} />
+                <input
+                  type="hidden"
+                  name="order"
+                  value={qa.Topic[index + 1].order + 1}
+                />
+                <IconButton
+                  variant="soft"
+                  type="submit"
+                  size="1"
+                  title={`Move topic down: ${topic.title}`}
+                >
+                  <ThickArrowDownIcon />
+                </IconButton>
+              </Form>
+            ) : null}
+
             <Form method="delete" action={qaTopicCrud(qa.id)}>
               <input type="hidden" name="topicId" value={topic.id} />
               <IconButton
@@ -191,6 +236,11 @@ export default function QaAdmin() {
       ))}
       <Form method="post" action={qaTopicCrud(qa.id)}>
         <Flex maxWidth="6" gap="2" mt="5">
+          <input
+            type="hidden"
+            name="order"
+            value={qa.Topic[qa.Topic.length - 1].order + 1}
+          />
           <TextField.Root placeholder="Topic title" name="title" required />
           <Button type="submit">Create topic</Button>
         </Flex>

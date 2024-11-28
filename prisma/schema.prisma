@@ -48,6 +48,7 @@ model Topic {
   updatedAt DateTime   @updatedAt
   QA        QA         @relation(fields: [qaId], references: [id], onDelete: Cascade)
   qaId      String
+  order     Float      @default(0)
   title     String
   questions Question[]
 }
