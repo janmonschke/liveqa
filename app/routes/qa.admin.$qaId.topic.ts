@@ -8,10 +8,10 @@ import { emitter } from "~/services/emitter.server";
 export const action: ActionFunction = async ({ request, params }) => {
   const qa = await isQaAdmin(params.qaId, request);
   const body = await request.formData();
+  const topicId = body.get("topicId")?.toString();
 
   switch (request.method) {
     case "DELETE": {
-      const topicId = body.get("topicId")?.toString();
       if (!topicId) {
         throw new Response("Not Found", { status: 404 });
       }
@@ -39,22 +39,20 @@ export const action: ActionFunction = async ({ request, params }) => {
       break;
     }
     case "PATCH": {
-      const topicId = body.get("topicId")?.toString();
       if (!topicId) {
         throw new Response("Not Found", { status: 404 });
       }
-      const orderStr = body.get("order")?.toString();
-      if (!orderStr) {
-        throw new Response("`order` missing", { status: 400 });
+      const title = body.get("title")?.toString();
+      if (!title) {
+        throw new Response("`title` missing", { status: 400 });
       }
-      const order = parseInt(orderStr, 10);
       await db.topic.update({
         where: {
           id: topicId,
           qaId: qa.id,
         },
         data: {
-          order,
+          title,
         },
       });
       break;

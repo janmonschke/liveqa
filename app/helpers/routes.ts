@@ -22,6 +22,10 @@ export function qaTopicCrud(qaId: string) {
   return `${qaAdmin(qaId)}/topic`;
 }
 
+export function qaTopicSwap(qaId: string) {
+  return `${qaAdmin(qaId)}/topic/swap`;
+}
+
 export function qaConfigCrud(qaId: string) {
   return `${qaAdmin(qaId)}/config`;
 }
@@ -29,4 +33,3 @@ export function qaConfigCrud(qaId: string) {
 export function qaAdminQuestionCrud(qaId: string) {
   return `${qaAdmin(qaId)}/question`;
 }
-

@@ -26,6 +26,7 @@ import {
   qaConfigCrud,
   qaQr,
   qaTopicCrud,
+  qaTopicSwap,
   qa as qaUrl,
 } from "~/helpers/routes";
 import { iconButtonSize } from "~/helpers/sizes";
@@ -140,13 +141,15 @@ export default function QaAdmin() {
               {topic.title}
             </Heading>
             {index > 0 ? (
-              <Form method="patch" action={qaTopicCrud(qa.id)}>
-                <input type="hidden" name="topicId" value={topic.id} />
+              <Form method="post" action={qaTopicSwap(qa.id)}>
+                <input type="hidden" name="topicAId" value={topic.id} />
                 <input
                   type="hidden"
-                  name="order"
-                  value={qa.Topic[index - 1].order - 1}
+                  name="topicBId"
+                  value={qa.Topic[index - 1].id}
                 />
+                <input type="hidden" name="newPositionA" value={qa.Topic[index -1 ].order} />
+                <input type="hidden" name="newPositionB" value={topic.order} />
                 <IconButton
                   variant="soft"
                   type="submit"
@@ -158,13 +161,15 @@ export default function QaAdmin() {
               </Form>
             ) : null}
             {index < qa.Topic.length - 1 ? (
-              <Form method="patch" action={qaTopicCrud(qa.id)}>
-                <input type="hidden" name="topicId" value={topic.id} />
+              <Form method="post" action={qaTopicSwap(qa.id)}>
+                <input type="hidden" name="topicAId" value={topic.id} />
                 <input
                   type="hidden"
-                  name="order"
-                  value={qa.Topic[index + 1].order + 1}
+                  name="topicBId"
+                  value={qa.Topic[index + 1].id}
                 />
+                <input type="hidden" name="newPositionA" value={qa.Topic[index + 1 ].order} />
+                <input type="hidden" name="newPositionB" value={topic.order} />
                 <IconButton
                   variant="soft"
                   type="submit"
@@ -239,7 +244,7 @@ export default function QaAdmin() {
           <input
             type="hidden"
             name="order"
-            value={qa.Topic[qa.Topic.length - 1].order + 1}
+            value={qa.Topic.length ? qa.Topic[qa.Topic.length - 1].order + 1 : 0}
           />
           <TextField.Root placeholder="Topic title" name="title" required />
           <Button type="submit">Create topic</Button>
