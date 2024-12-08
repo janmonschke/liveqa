@@ -1,10 +1,6 @@
 import { Box, Button, Flex, Heading, TextField } from "@radix-ui/themes";
-import {
-  ActionFunction,
-  LoaderFunctionArgs,
-  redirect,
-} from "@remix-run/node";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import { ActionFunction, LoaderFunctionArgs, redirect } from "react-router";
+import { Form, Link, useLoaderData } from "react-router";
 import invariant from "tiny-invariant";
 import { db } from "~/db.server";
 import { qaAdmin } from "~/helpers/routes";

@@ -1,5 +1,5 @@
 import { Badge, Box, Button, Dialog, Flex, TextField } from "@radix-ui/themes";
-import { useFetcher, useSubmit } from "@remix-run/react";
+import { useFetcher, useSubmit } from "react-router";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { qaQuestionCrud } from "~/helpers/routes";
 import { Question } from "./Question";

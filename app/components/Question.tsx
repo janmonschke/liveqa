@@ -1,6 +1,6 @@
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { IconButton, Tooltip } from "@radix-ui/themes";
-import { Form, useFetcher, useSubmit } from "@remix-run/react";
+import { Form, useFetcher, useSubmit } from "react-router";
 import { FormEvent, useCallback } from "react";
 import { qaQuestionCrud } from "~/helpers/routes";
 import { Vote } from "./Vote";

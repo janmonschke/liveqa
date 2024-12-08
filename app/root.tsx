@@ -1,15 +1,8 @@
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  useRouteLoaderData,
-  data,
-} from "@remix-run/react";
+import { Links, Meta, Outlet, Scripts, useRouteLoaderData, data } from "react-router";
 import { Container, Theme, ThemePanel } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
 import { popToast } from "./services/toast.server";
-import { LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs } from "react-router";
 import { Toast } from "./components/Toast";
 
 export async function loader({ request }: LoaderFunctionArgs) {

@@ -1,6 +1,6 @@
 import { DoubleArrowDownIcon, DoubleArrowUpIcon } from "@radix-ui/react-icons";
 import { IconButton, Tooltip } from "@radix-ui/themes";
-import { Form, useFetcher, useSubmit } from "@remix-run/react";
+import { Form, useFetcher, useSubmit } from "react-router";
 import { FormEvent, useCallback } from "react";
 import { qaVoteCrud } from "~/helpers/routes";
 import { iconButtonSize } from "~/helpers/sizes";

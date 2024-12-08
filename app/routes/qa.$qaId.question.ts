@@ -1,4 +1,4 @@
-import { ActionFunction, redirect } from "@remix-run/node";
+import { ActionFunction, redirect } from "react-router";
 import { db } from "~/db.server";
 import { isQaParticipant, isVotingEnabledForQa } from "~/helpers/access";
 import { updateQaEvent } from "~/helpers/events";

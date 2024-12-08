@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "react-router";
 import { eventStream } from "remix-utils/sse/server";
 import invariant from "tiny-invariant";
 import { updateQaEvent } from "~/helpers/events";

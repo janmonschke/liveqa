@@ -1,8 +1,4 @@
-import {
-  redirect,
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-} from "@remix-run/node";
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router";
 import { AuthForm } from "~/components/AuthForm";
 import { authenticator } from "../services/auth.server";
 import { putToast } from "../services/toast.server";

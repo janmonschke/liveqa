@@ -15,8 +15,8 @@ import {
   Text,
   Tooltip,
 } from "@radix-ui/themes";
-import { LoaderFunctionArgs } from "@remix-run/node";
-import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
+import { LoaderFunctionArgs } from "react-router";
+import { Form, Link, useLoaderData, useSubmit } from "react-router";
 import { FormEvent } from "react";
 import { BaseQuestion } from "~/components/BaseQuestion";
 import { db } from "~/db.server";
