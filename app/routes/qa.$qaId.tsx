@@ -1,5 +1,5 @@
 import { Box, Heading } from "@radix-ui/themes";
-import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { useFetchers, useLoaderData, useRevalidator } from "@remix-run/react";
 import { useEffect, useMemo, useRef } from "react";
 import { useEventSource } from "remix-utils/sse/react";
@@ -87,7 +87,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     acc[curr.questionId] = true;
     return acc;
   }, {} as Record<string, boolean>);
-  return json({ qa, participant, participantVotes });
+  return { qa, participant, participantVotes };
 };
 
 export default function QaView() {

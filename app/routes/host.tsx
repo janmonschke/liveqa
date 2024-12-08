@@ -1,7 +1,6 @@
 import { Box, Button, Flex, Heading, TextField } from "@radix-ui/themes";
 import {
   ActionFunction,
-  json,
   LoaderFunctionArgs,
   redirect,
 } from "@remix-run/node";
@@ -23,7 +22,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       hostId: host.id,
     },
   });
-  return json({ qas, host });
+  return { qas, host };
 };
 
 export const action: ActionFunction = async ({ request }) => {

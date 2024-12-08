@@ -15,7 +15,7 @@ import {
   Text,
   Tooltip,
 } from "@radix-ui/themes";
-import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
 import { FormEvent } from "react";
 import { BaseQuestion } from "~/components/BaseQuestion";
@@ -54,7 +54,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     },
   });
 
-  return json({ qa });
+  return { qa };
 };
 
 export default function QaAdmin() {

@@ -4,6 +4,7 @@ import {
   Outlet,
   Scripts,
   useRouteLoaderData,
+  data,
 } from "@remix-run/react";
 import { Container, Theme, ThemePanel } from "@radix-ui/themes";
 import "@radix-ui/themes/styles.css";
@@ -13,7 +14,7 @@ import { Toast } from "./components/Toast";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { toast, headers } = await popToast(request);
-  return Response.json({ toast }, { headers });
+  return data({ toast }, { headers });
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
